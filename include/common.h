@@ -1301,6 +1301,8 @@ char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);
 
+void add_allowed_path(char *config_value, char *item_type);
+
 #ifndef _WINDOWS
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
