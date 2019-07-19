@@ -233,17 +233,8 @@ class JMXItemChecker extends ItemChecker
 
 		if (fieldNames.equals(""))
 		{
-			try
-			{
-				if (isPrimitiveAttributeType(dataObject))
-					return dataObject.toString();
-				else
-					throw new NoSuchMethodException();
-			}
-			catch (NoSuchMethodException e)
-			{
-				throw new ZabbixException("Data object type cannot be converted to string.");
-			}
+			// Use toString() method of any mbean to print out its contents
+			return dataObject.toString();
 		}
 
 		if (dataObject instanceof CompositeData)
