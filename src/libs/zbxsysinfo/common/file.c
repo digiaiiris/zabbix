@@ -80,7 +80,7 @@ int	VFS_FILE_TIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	filename = get_rparam(request, 0);
-	type = get_rparam(request, 1);fv
+	type = get_rparam(request, 1);
 
 	if (NULL == filename || '\0' == *filename)
 	{
