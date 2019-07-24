@@ -24,7 +24,6 @@
 
 #include "file.h"
 #include "dir.h"
-#include "gnuregex.h"
 #include "http.h"
 #include "net.h"
 #include "system.h"
