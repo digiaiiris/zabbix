@@ -30,6 +30,7 @@
 #include "system.h"
 #include "zabbix_stats.h"
 #include "zbxexec.h"
+#include "zbxregexp.h"
 
 typedef struct allowed_path {
 	struct allowed_path *next;
@@ -268,9 +269,9 @@ static int	SYSTEM_RUN(AGENT_REQUEST *request, AGENT_RESULT *result)
 int CHECK_PATH_ALLOWED(const char *filename, unsigned char op)
 {
 	allowed_path_t *allowed_path;
-	regex_t path_re;
+	const char *error = NULL;
+	zbx_regexp_t *path_re;
 	int result;
-	int reg_error;
 
 	allowed_path = allowed_path_list;
 
@@ -287,26 +288,17 @@ int CHECK_PATH_ALLOWED(const char *filename, unsigned char op)
 			continue;
 		}
 		zabbix_log(LOG_LEVEL_TRACE, "checking path against '%s'", allowed_path->path);
-		if (0 == (reg_error = regcomp(&path_re, allowed_path->path, 0)))
+		if (SUCCEED == zbx_regexp_compile(allowed_path->path, &path_re, &error))
 		{
-			result = regexec(&path_re, filename, 0, NULL, 0);
-			regfree(&path_re);
+			result = zbx_regexp_match_precompiled(filename, path_re);
+			zbx_regexp_free(path_re);
 			if (0 == result)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "access to path '%s' is allowed", filename);
 				return 0;
 			}
 		} else {
-			char err_buf[MAX_STRING_LEN];
-
-			regerror(reg_error, &path_re, err_buf, sizeof(err_buf));
-			zabbix_log(LOG_LEVEL_WARNING, "cannot compile regex for allowed path: \"%s\"", err_buf);
-
-#ifdef _WINDOWS
-			/* the Windows gnuregex implementation does not correctly clean up */
-			/* allocated memory after regcomp() failure                        */
-			regfree(&path_re);
-#endif
+			zabbix_log(LOG_LEVEL_WARNING, "cannot compile regex for allowed path: \"%s\"", error);
 		}
 
 		allowed_path = allowed_path->next;
