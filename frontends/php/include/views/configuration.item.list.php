@@ -69,7 +69,7 @@ $itemTable = (new CTableInfo())
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
 +     _('Test'),
-      $data['showInfoColumn'] ? _('Info') : null
+      _('Info')
 	]);
 
 $current_time = time();
