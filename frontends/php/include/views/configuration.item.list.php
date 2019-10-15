@@ -69,6 +69,7 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Applications'),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url),
+		_('Test'),
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
@@ -85,6 +86,7 @@ $this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+$items_testing = DBfetchColumn(DBselect('SELECT itemid FROM item_testing'),'itemid');
 foreach ($data['items'] as $item) {
 	// description
 	$description = [];
@@ -127,6 +129,21 @@ foreach ($data['items'] as $item) {
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status'], $item['state']))
 		->addSID()
+	);
+
+	// start/stop testing
+	$style = ITEM_STATUS_ACTIVE;
+	$testBtn = new CLink( _('Start'), '?form=test&hostid='.$item['hostid'].'&itemid='.$item['itemid']);
+	if (in_array($item['itemid'], $items_testing)) {
+		$style = ITEM_STATUS_DISABLED;
+		$testBtn = new CLink( _('Stop'), '?group_itemid[]='.$item['itemid'].'&action=test.stop');
+		$testBtn->addSID();
+		$testBtn->addConfirmation('Stop testing?');
+	}
+
+	$test = new CCol(($testBtn)
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($style))
 	);
 
 	// info
@@ -233,6 +250,7 @@ foreach ($data['items'] as $item) {
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,
+		($item['type'] == ITEM_TYPE_HTTPAGENT || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['templateid'] != '0' ? 'N / A' : $test),
 		$data['showInfoColumn'] ? makeInformationList($info_icons) : null
 	]);
 }
