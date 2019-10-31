@@ -883,8 +883,8 @@ elseif (hasRequest('start')) {
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
-		$item['test_value'] = zbx_dbstr(getRequest('test_value'));
-		$item['test_delay'] = zbx_dbstr(getRequest('test_delay'));
+		$item['test_value'] = getRequest('test_value');
+		$item['test_delay'] = getRequest('test_delay');
 
 		DB::checkValueTypes('item_testing',$item);
 		$error = false;
