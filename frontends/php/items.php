@@ -883,14 +883,21 @@ elseif (hasRequest('start')) {
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
-		$item['test_value'] = getRequest('test_value');
-		$item['test_delay'] = getRequest('test_delay');
+		$item['test_value'] = zbx_dbstr(getRequest('test_value'));
+		$item['test_delay'] = zbx_dbstr(getRequest('test_delay'));
 
 		DB::checkValueTypes('item_testing',$item);
 		$error = false;
 		try {
+			$values = array_values($item);
+			foreach($values as $value) {
+				if(gettype($value) == 'string') {
+					$value = zbx_dbstr($value);
+				}
+			}
+
 			$sql = 'INSERT INTO item_testing ('.implode(',', array_keys($item)).')'.
-					' VALUES ('.implode(',', array_values($item)).')';
+					' VALUES ('.implode(',', $values)).')';
 
 			$result = DBexecute($sql);
 		} catch (Exception $e) {
