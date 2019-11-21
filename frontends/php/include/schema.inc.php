@@ -1703,10 +1703,15 @@ return [
 				'default' => '0',
 			],
 		],
-	],
+	], # check database\mysql\create_testing_table.sql for table creation script
 	'item_testing' => [
-		'key' => 'itemid',
+		'key' => 'testid',
 		'fields' => [
+         'testid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
 			'itemid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
