@@ -288,6 +288,14 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				]
 			]
 		],
+		'iiris' => [
+			'label' => _('Iiris extensions'),
+			'user_type' => USER_TYPE_SUPER_ADMIN,
+			'default_page_id' => 0,
+			'pages' => [
+				['url' => 'testing.php','label' => _('Testing')]
+			]
+		],
 		'login' => [
 			'label' => _('Login'),
 			'user_type' => 0,

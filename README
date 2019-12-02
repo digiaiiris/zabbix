@@ -1,3 +1,13 @@
+Digia Iiris test tool changes for zabbix.
+
+Use command like "diff -ru1w zabbix/frontends/ zabbix_iiris/frontends/"
+to create new patch file
+
+Use command "patch -d /usr/local/src/zabbix/ -p1 --ignore-whitespace -i iiris.patch"
+to apply patch inside zabbix directory
+
+--------------------------------------------------------------------------
+
 Zabbix is free software, released under the GNU General Public License
 (GPL) version 2.
 
