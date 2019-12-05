@@ -48,7 +48,7 @@ void load_allowed_paths(char **lines)
 
 	for (pline = lines; NULL != *pline; pline++)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Adding allowed path (%s)", pline);
+		zabbix_log(LOG_LEVEL_DEBUG, "Adding allowed path (%s)", *pline);
 		if (NULL == (p = strchr(*pline, ','))) {
 			add_allowed_path(*pline, NULL);
 		} else {
