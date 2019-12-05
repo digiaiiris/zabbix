@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/test.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
@@ -882,7 +883,8 @@ elseif (hasRequest('start')) {
 			],
 			'itemids' => getRequest('itemid')
 		]);
-		$item = $items[0];
+      $item = $items[0];
+      $org_item = $item;
 		$item['test_value'] = getRequest('test_value');
 		$item['test_delay'] = getRequest('test_delay');
 
@@ -906,9 +908,15 @@ elseif (hasRequest('start')) {
 		}
 
 		if (!$error) {
-			show_message('Test started');
+			$result_bool = convert_item_to_test($org_item, getRequest('test_value'), getRequest('test_delay'));
+			if ($result_bool) {
+						show_message('Test started');
+			} else {
+						show_error_message('Failed to edit test item.');
+			}
 			unset($_REQUEST['itemid'], $_REQUEST['form']);
 		}
+
 	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'test.stop') {
