@@ -1707,7 +1707,7 @@ return [
 	'item_testing' => [
 		'key' => 'testid',
 		'fields' => [
-         'testid' => [
+			'testid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
