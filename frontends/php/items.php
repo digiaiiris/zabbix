@@ -883,8 +883,8 @@ elseif (hasRequest('start')) {
 			],
 			'itemids' => getRequest('itemid')
 		]);
-      $item = $items[0];
-      $org_item = $item;
+		$item = $items[0];
+		$org_item = $item;
 		$item['test_value'] = getRequest('test_value');
 		$item['test_delay'] = getRequest('test_delay');
 
@@ -1493,17 +1493,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 }
 elseif (isset($_REQUEST['form']) && $_REQUEST['form'] == 'test') {
 	if (hasRequest('itemid')) {
-		  $items = API::Item()->get([
-						 'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'value_type'],
-						 'selectTriggers' => ['description','expression'],
-						 'itemids' => getRequest('itemid')
-			]);
-			$item = $items[0];
+		$items = API::Item()->get([
+			'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'value_type'],
+			'selectTriggers' => ['description','expression'],
+			'itemids' => getRequest('itemid')
+		]);
+		$item = $items[0];
 
-			// render view
-			$itemView = new CView('configuration.item.test', $item);
-			$itemView->render();
-			$itemView->show();
+		// render view
+		$itemView = new CView('configuration.item.test', $item);
+		$itemView->render();
+		$itemView->show();
 	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
