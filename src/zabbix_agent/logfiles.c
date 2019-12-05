@@ -18,10 +18,10 @@
 **/
 
 #include "common.h"
+#include "sysinfo.h"
 #include "logfiles.h"
 #include "log.h"
 #include "active.h"
-#include "sysinfo.h"
 
 #if defined(_WINDOWS)
 #	include "symbols.h"
