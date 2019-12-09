@@ -891,17 +891,7 @@ elseif (hasRequest('start')) {
 		DB::checkValueTypes('item_testing',$item);
 		$error = false;
 		try {
-			$values = array_values($item);
-			foreach($values as $value) {
-				if(gettype($value) == 'string') {
-					$value = zbx_dbstr($value);
-				}
-			}
-
-			$sql = 'INSERT INTO item_testing ('.implode(',', array_keys($item)).')'.
-					' VALUES ('.implode(',', $values)).')';
-
-			$result = DBexecute($sql);
+			$result = add_to_testing_table($item);
 		} catch (Exception $e) {
 			$error = true;
 			show_error_message($e->getMessage());
@@ -910,9 +900,9 @@ elseif (hasRequest('start')) {
 		if (!$error) {
 			$result_bool = convert_item_to_test($org_item, getRequest('test_value'), getRequest('test_delay'));
 			if ($result_bool) {
-						show_message('Test started');
+				show_message('Test started');
 			} else {
-						show_error_message('Failed to edit test item.');
+				show_error_message('Failed to edit test item.');
 			}
 			unset($_REQUEST['itemid'], $_REQUEST['form']);
 		}
@@ -924,24 +914,7 @@ elseif (hasRequest('action') && getRequest('action') === 'test.stop') {
 		$itemid = getRequest('group_itemid')[0];
 		$error = false;
 		try {
-			$sql_select = 'SELECT * FROM item_testing WHERE itemid='.$itemid;
-			$result = DBselect($sql_select);
-			$testItem = DBfetchArray($result)[0];
-
-			$item = [];
-			foreach ($testItem as $key => $value) {
-				if($key != 'test_value' && $key != 'test_delay' && $key != 'testid') {
-					$item[$key] = $value;
-				}
-			}
-			$item['itemid'] = $itemid;
-
-			$response = API::Item()->update($item);
-			$items = [];
-			if ($response) {
-				$items[] = $itemid;
-				$result = DB::delete('item_testing', array('itemid'=>$items));
-			}
+			$revert_bool = revert_test_to_original($itemid);
 		} catch (Exception $e) {
 			$error = true;
 			show_error_message($e->getMessage());
