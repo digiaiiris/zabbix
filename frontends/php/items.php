@@ -880,7 +880,8 @@ elseif (hasRequest('start')) {
 				 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				 'snmpv3_privprotocol', 'snmpv3_contextname', 'evaltype', 'jmx_endpoint', 'master_itemid'
-			],
+         ],
+         'selectHosts' => ['hostid','maintenance_status','host'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
