@@ -202,7 +202,7 @@ $fields = [
 								],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'start' =>              [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,   null],
+	'start' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,   null],
 	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'copy' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -874,14 +874,13 @@ elseif (hasRequest('start')) {
 	if (hasRequest('itemid') && hasRequest('test_value') && hasRequest('test_delay')) {
 		$items = API::Item()->get([
 			'output' => [
-				 'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				 'snmpv3_securitylevel',    'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt',
-				 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-				 'snmpv3_privprotocol', 'snmpv3_contextname', 'evaltype', 'jmx_endpoint', 'master_itemid'
-         ],
-         'selectHosts' => ['hostid','maintenance_status','host'],
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+				'snmpv3_securitylevel',    'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt',
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'evaltype', 'jmx_endpoint', 'master_itemid'
+			],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
