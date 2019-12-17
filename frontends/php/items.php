@@ -24,6 +24,7 @@ require_once dirname(__FILE__).'/include/hostgroups.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
+require_once dirname(__FILE__).'/include/test.inc.php';
 
 $page['title'] = _('Configuration of items');
 $page['file'] = 'items.php';
@@ -201,7 +202,7 @@ $fields = [
 								],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'start' =>              [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,   null],
+	'start' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,   null],
 	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'copy' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -873,42 +874,39 @@ elseif (hasRequest('start')) {
 	if (hasRequest('itemid') && hasRequest('test_value') && hasRequest('test_delay')) {
 		$items = API::Item()->get([
 			'output' => [
-				 'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
-				 'snmpv3_securitylevel',    'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt',
-				 'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				 'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
-				 'snmpv3_privprotocol', 'snmpv3_contextname', 'evaltype', 'jmx_endpoint', 'master_itemid'
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'snmpv3_securityname',
+				'snmpv3_securitylevel',    'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'formula', 'logtimefmt',
+				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname', 'evaltype', 'jmx_endpoint', 'master_itemid'
 			],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
+		$org_item = $item;
 		$item['test_value'] = getRequest('test_value');
 		$item['test_delay'] = getRequest('test_delay');
 
 		DB::checkValueTypes('item_testing',$item);
 		$error = false;
 		try {
-			$values = array_values($item);
-			foreach($values as $value) {
-				if(gettype($value) == 'string') {
-					$value = zbx_dbstr($value);
-				}
-			}
-
-			$sql = 'INSERT INTO item_testing ('.implode(',', array_keys($item)).')'.
-					' VALUES ('.implode(',', $values)).')';
-
-			$result = DBexecute($sql);
+			$result = add_to_testing_table($item);
 		} catch (Exception $e) {
 			$error = true;
 			show_error_message($e->getMessage());
 		}
 
 		if (!$error) {
-			show_message('Test started');
+			$result_bool = convert_item_to_test($org_item, getRequest('test_value'), getRequest('test_delay'));
+			if ($result_bool) {
+				show_message('Test started');
+			} else {
+				show_error_message('Failed to edit test item.');
+			}
 			unset($_REQUEST['itemid'], $_REQUEST['form']);
 		}
+
 	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'test.stop') {
@@ -916,24 +914,7 @@ elseif (hasRequest('action') && getRequest('action') === 'test.stop') {
 		$itemid = getRequest('group_itemid')[0];
 		$error = false;
 		try {
-			$sql_select = 'SELECT * FROM item_testing WHERE itemid='.$itemid;
-			$result = DBselect($sql_select);
-			$testItem = DBfetchArray($result)[0];
-
-			$item = [];
-			foreach ($testItem as $key => $value) {
-				if($key != 'test_value' && $key != 'test_delay' && $key != 'testid') {
-					$item[$key] = $value;
-				}
-			}
-			$item['itemid'] = $itemid;
-
-			$response = API::Item()->update($item);
-			$items = [];
-			if ($response) {
-				$items[] = $itemid;
-				$result = DB::delete('item_testing', array('itemid'=>$items));
-			}
+			$revert_bool = revert_test_to_original($itemid);
 		} catch (Exception $e) {
 			$error = true;
 			show_error_message($e->getMessage());
@@ -1485,17 +1466,17 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], ['create', 'upda
 }
 elseif (isset($_REQUEST['form']) && $_REQUEST['form'] == 'test') {
 	if (hasRequest('itemid')) {
-		  $items = API::Item()->get([
-						 'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'value_type'],
-						 'selectTriggers' => ['description','expression'],
-						 'itemids' => getRequest('itemid')
-			]);
-			$item = $items[0];
+		$items = API::Item()->get([
+			'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'value_type'],
+			'selectTriggers' => ['description','expression'],
+			'itemids' => getRequest('itemid')
+		]);
+		$item = $items[0];
 
-			// render view
-			$itemView = new CView('configuration.item.test', $item);
-			$itemView->render();
-			$itemView->show();
+		// render view
+		$itemView = new CView('configuration.item.test', $item);
+		$itemView->render();
+		$itemView->show();
 	}
 }
 elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))

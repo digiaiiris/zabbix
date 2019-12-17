@@ -1,6 +1,6 @@
 Digia Iiris test tool changes for zabbix.
 
-Use command like "diff -ru1w zabbix/frontends/ zabbix_iiris/frontends/"
+Use command like "diff -ru1wN zabbix/frontends/ zabbix_iiris/frontends/"
 to create new patch file
 
 Use command "patch -d /usr/local/src/zabbix/ -p1 --ignore-whitespace -i iiris.patch"
