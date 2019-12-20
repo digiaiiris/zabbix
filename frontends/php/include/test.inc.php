@@ -170,7 +170,7 @@ function enable_test_maintenance($hostid, $in_maintenance) {
       $test_maintenance = API::Maintenance()->get([
          'selectHosts' => ['hostid'],
          'selectTimeperiods' => API_OUTPUT_EXTEND,
-         'filter' => ['name'='Testing maintenance'],
+         'filter' => ['name'=>'Testing maintenance'],
          'output' => ['maintenanceid', 'name', 'active_till']
       ]);
       if ($test_maintenance) {
@@ -184,10 +184,10 @@ function enable_test_maintenance($hostid, $in_maintenance) {
          'description' => 'Maintenance for testing tool',
          'active_since' => $active_since_date,
          'active_till' => $active_till_date,
-         'timeperiods' => [{
-            "timeperiod_type": 0,
-            "period": $year
-         }],
+         'timeperiods' => [
+            "timeperiod_type" => 0,
+            "period" => $year
+         ],
          'hostids' => $hostid
       ];
       $result = API::Maintenance()->create($maintenance);
@@ -215,7 +215,7 @@ function remove_test_maintenance($hostid) {
    $test_maintenance = API::Maintenance()->get([
       'selectHosts' => ['hostid'],
       'selectTimeperiods' => API_OUTPUT_EXTEND,
-      'filter' => ['name'='Testing maintenance'],
+      'filter' => ['name'=>'Testing maintenance'],
       'output' => ['maintenanceid', 'name', 'active_till']
    ]);
 }
