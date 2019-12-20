@@ -880,7 +880,8 @@ elseif (hasRequest('start')) {
 				'valuemapid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname', 'evaltype', 'jmx_endpoint', 'master_itemid'
-			],
+         ],
+         'selectHosts' => ['hostid','maintenance_status'],
 			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
@@ -891,18 +892,19 @@ elseif (hasRequest('start')) {
 		DB::checkValueTypes('item_testing',$item);
 		$error = false;
 		try {
-			$result = add_to_testing_table($item);
+			$add_result = add_to_testing_table($item);
 		} catch (Exception $e) {
 			$error = true;
 			show_error_message($e->getMessage());
 		}
 
 		if (!$error) {
-			$result_bool = convert_item_to_test($org_item, getRequest('test_value'), getRequest('test_delay'));
-			if ($result_bool) {
+			$convert_result = convert_item_to_test($org_item, getRequest('test_value'), getRequest('test_delay'));
+			if ($convert_result) {
 				show_message('Test started');
 			} else {
-				show_error_message('Failed to edit test item.');
+            show_error_message('Failed to edit test item.');
+            remove_from_testing_table($item['itemid']);
 			}
 			unset($_REQUEST['itemid'], $_REQUEST['form']);
 		}
@@ -914,7 +916,7 @@ elseif (hasRequest('action') && getRequest('action') === 'test.stop') {
 		$itemid = getRequest('group_itemid')[0];
 		$error = false;
 		try {
-			$revert_bool = revert_test_to_original($itemid);
+         $revert_bool = revert_test_to_original($itemid);
 		} catch (Exception $e) {
 			$error = true;
 			show_error_message($e->getMessage());

@@ -35,6 +35,8 @@ function convert_item_to_test($org_item, $test_value, $test_delay) {
    $result = false;
    $error = false;
    try {
+      enable_test_maintenance($org_item['hostid'], $org_item['host']['maintenance_status']);
+
       $param_test_value = $test_value;
       $test_item = $org_item;
       // use original key as identifier for new keys. Needs to be modified not to break the new key
@@ -59,7 +61,7 @@ function convert_item_to_test($org_item, $test_value, $test_delay) {
       $error = true;
    }
    
-   if (!$error) {
+   if (!$error && $result) {
       return TRUE;
    } else {
       return FALSE;
@@ -90,16 +92,18 @@ function revert_test_to_original($test_item_id) {
       $item['itemid'] = $test_item_id;
 
       $response = API::Item()->update($item);
-      $items = [];
+
       if ($response) {
-         $items[] = $test_item_id;
-         $result = DB::delete('item_testing', array('itemid'=>$items));
+         $result = remove_from_testing_table($test_item_id);
+         if ($result) {
+            remove_test_maintenance($item['hostid']);
+         }
       }
    } catch (Exception $e) {
       $error = true;
    }
 
-   if (!$error) {
+   if (!$error && $result) {
       return TRUE;
    } else {
       return FALSE;
@@ -129,3 +133,119 @@ function add_to_testing_table($item) {
 
    return $result;
 }
+
+/**
+ * Removes item from item_testing table 
+ *
+ * @param string $itemid   item to be removed
+ * 
+ * @return bool
+ */
+function remove_from_testing_table($itemid) {
+   $result = false;
+   $result = DB::delete('item_testing', array('itemid'=>$itemid));
+
+   return $result;
+}
+
+/**
+ * Put host on maintenance at start of testing
+ *
+ * @param string $hostid   host to start testing
+ * @param integer $in_maintenance   maintenance status
+ * 
+ * @return bool
+ */
+function enable_test_maintenance($hostid, $in_maintenance) {
+   $test_maintenance = false;
+   $result = false;
+
+   $now = date('Y-m-d+H:i');
+   $year = (365 * 24 * 60 * 60);
+   $next_year = $now + $year;
+	$active_since_date = $now;
+   $active_till_date = $next_year;
+   $timeperiod = [{
+      "timeperiod_type": 0,
+      "period": $year
+   }]
+
+   if ($in_maintenance == 1) { 
+      $test_maintenance = API::Maintenance()->get([
+         'selectHosts' => ['hostid'],
+         'selectTimeperiods' => API_OUTPUT_EXTEND,
+         'filter' => ['name'='Testing maintenance'],
+         'output' => ['maintenanceid', 'name', 'active_till']
+      ]);
+      if ($test_maintenance) {
+         $test_maintenance = $test_maintenance[0];
+      }
+   }
+
+   if (!$test_maintenance) { # create new test maintenance
+      $maintenance = [
+         'name' => 'Testing maintenance',
+         'description' => 'Maintenance for testing tool',
+         'active_since' => $active_since_date,
+         'active_till' => $active_till_date,
+         'timeperiods' => $timeperiod,
+         'hostids' => $hostid
+      ];
+      $result = API::Maintenance()->create($maintenance);
+   
+   } else { # update test maintenance
+      $hostids = $test_maintenance['hostids'];
+      $hostids[] = $hostid;
+      $maintenance = [
+         'maintenanceid' => $test_maintenance['maintenanceid'],
+         'hostids' => $hostids
+      ];
+      $result = API::Maintenance()->update($maintenance);
+   }
+   return $result;
+}
+
+/**
+ * Remove test maintenance on host (only if there is no items to test)
+ *
+ * @param string $hostid   host to start testing
+ * 
+ * @return bool
+ */
+function remove_test_maintenance($hostid) {
+   $test_maintenance = API::Maintenance()->get([
+      'selectHosts' => ['hostid'],
+      'selectTimeperiods' => API_OUTPUT_EXTEND,
+      'filter' => ['name'='Testing maintenance'],
+      'output' => ['maintenanceid', 'name', 'active_till']
+   ]);
+}
+
+/*
+{
+  "Form data": {
+    "sid": "5cb8c5e124738363",
+    "form_refresh": "3",
+    "form": "create",
+    "timeperiods[0][timeperiod_type]": "0",
+    "timeperiods[0][every]": "1",
+    "timeperiods[0][month]": "0",
+    "timeperiods[0][dayofweek]": "0",
+    "timeperiods[0][day]": "1",
+    "timeperiods[0][start_time]": "43200",
+    "timeperiods[0][start_date]": "2019-12-17+08:25",
+    "timeperiods[0][period]": "90000",
+    "mname": "twst",
+    "maintenance_type": "0",
+    "active_since": "2019-12-17+00:00",
+    "active_till": "2019-12-18+00:00",
+    "description": "sse",
+    "hostids[]": "10084",
+    "tags_evaltype": "0",
+    "tags[0][tag]": "",
+    "tags[0][operator]": "2",
+    "tags[0][value]": "",
+    "add": "Add"
+  }
+}
+*/
