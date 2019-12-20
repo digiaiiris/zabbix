@@ -165,10 +165,6 @@ function enable_test_maintenance($hostid, $in_maintenance) {
    $next_year = $now + $year;
 	$active_since_date = $now;
    $active_till_date = $next_year;
-   $timeperiod = [{
-      "timeperiod_type": 0,
-      "period": $year
-   }]
 
    if ($in_maintenance == 1) { 
       $test_maintenance = API::Maintenance()->get([
@@ -188,7 +184,10 @@ function enable_test_maintenance($hostid, $in_maintenance) {
          'description' => 'Maintenance for testing tool',
          'active_since' => $active_since_date,
          'active_till' => $active_till_date,
-         'timeperiods' => $timeperiod,
+         'timeperiods' => [{
+            "timeperiod_type": 0,
+            "period": $year
+         }],
          'hostids' => $hostid
       ];
       $result = API::Maintenance()->create($maintenance);
