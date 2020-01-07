@@ -189,6 +189,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = API::Maintenance()->update($maintenance);
 		}
 		else {
+         echo("<script>console.log(" . $maintenance . ");</script>");
 			$result = API::Maintenance()->create($maintenance);
 		}
 	}

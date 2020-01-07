@@ -35,7 +35,7 @@ function convert_item_to_test($org_item, $test_value, $test_delay) {
    $result = false;
    $error = false;
    try {
-      enable_test_maintenance($org_item['hostid'], $org_item['host']['maintenance_status']);
+      enable_test_maintenance($org_item['hostid'], $org_item['hosts'][0]['maintenance_status']);
 
       $param_test_value = $test_value;
       $test_item = $org_item;
@@ -162,9 +162,9 @@ function enable_test_maintenance($hostid, $in_maintenance) {
 
    $now = date('Y-m-d+H:i');
    $year = (365 * 24 * 60 * 60);
-   $next_year = $now + $year;
+   $next_year = time() + $year;
 	$active_since_date = $now;
-   $active_till_date = $next_year;
+   $active_till_date = date('Y-m-d+H:i', $next_year);
 
    if ($in_maintenance == 1) { 
       $test_maintenance = API::Maintenance()->get([
@@ -219,6 +219,18 @@ function remove_test_maintenance($hostid) {
       'output' => ['maintenanceid', 'name', 'active_till']
    ]);
 }
+
+/*
+
+   array_merge(): Argument #2 is not an array [items.php:902 → convert_item_to_test() → enable_test_maintenance() → CApiWrapper->__call() → CFrontendApiWrapper->callMethod() → CApiWrapper->callMethod() → 
+   CFrontendApiWrapper->callClientMethod() → CLocalApiClient->callMethod() → CMaintenance->create() → array_merge() in include/classes/api/services/CMaintenance.php:270]
+
+   At least one host group or host must be selected. [items.php:902 → convert_item_to_test() → enable_test_maintenance() → CApiWrapper->__call() → CFrontendApiWrapper->callMethod() → CApiWrapper->callMethod() → 
+   CFrontendApiWrapper->callClientMethod() → CLocalApiClient->callMethod() → CMaintenance->create() → CApiService::exception() in include/classes/api/services/CMaintenance.php:279]
+*/
+
+
+
 
 /*
 {
