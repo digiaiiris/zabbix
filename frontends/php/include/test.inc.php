@@ -32,14 +32,14 @@
  * @return bool
  */
 function convert_item_to_test($org_item, $test_value, $test_delay) {
-   $result = false;
+   $response = false;
    $error = false;
    try {
-      enable_test_maintenance($org_item['hostid'], $org_item['hosts'][0]['maintenance_status']);
+      enable_test_maintenance($org_item['hostid']);
 
       $param_test_value = $test_value;
       $test_item = $org_item;
-      // use original key as identifier for new keys. Needs to be modified not to break the new key
+      // use original key as identifier for new keys. Original key needs to be modified not to break the new key
       $org_key = $test_item['key_'];
       $org_key = str_replace('[','(',$org_key);
       $org_key = str_replace(']',')',$org_key);
@@ -61,7 +61,7 @@ function convert_item_to_test($org_item, $test_value, $test_delay) {
       $error = true;
    }
    
-   if (!$error && $result) {
+   if (!$error && $response) {
       return TRUE;
    } else {
       return FALSE;
@@ -94,9 +94,14 @@ function revert_test_to_original($test_item_id) {
       $response = API::Item()->update($item);
 
       if ($response) {
+         $sql_test_items_on_host = 'SELECT COUNT(hostid) AS "hosts" FROM item_testing WHERE hostid=' . zbx_dbstr($item['hostid']);
+         $sql_result = DBselect($sql_test_items_on_host);
+         $host_test_item_count = DBfetchArray($sql_result)[0]['hosts'];
+
          $result = remove_from_testing_table($test_item_id);
-         if ($result) {
-            remove_test_maintenance($item['hostid']);
+         
+         if ($result && $host_test_item_count < 2) {
+            remove_from_test_maintenance($item['hostid']);
          }
       }
    } catch (Exception $e) {
@@ -152,49 +157,54 @@ function remove_from_testing_table($itemid) {
  * Put host on maintenance at start of testing
  *
  * @param string $hostid   host to start testing
- * @param integer $in_maintenance   maintenance status
  * 
  * @return bool
  */
-function enable_test_maintenance($hostid, $in_maintenance) {
+function enable_test_maintenance($hostid) {
    $test_maintenance = false;
    $result = false;
 
-   $now = date('Y-m-d+H:i');
    $year = (365 * 24 * 60 * 60);
-   $next_year = time() + $year;
-	$active_since_date = $now;
-   $active_till_date = date('Y-m-d+H:i', $next_year);
+	$active_since_date = time();
+   $active_till_date = time() + $year;
 
-   if ($in_maintenance == 1) { 
-      $test_maintenance = API::Maintenance()->get([
-         'selectHosts' => ['hostid'],
-         'selectTimeperiods' => API_OUTPUT_EXTEND,
-         'filter' => ['name'=>'Testing maintenance'],
-         'output' => ['maintenanceid', 'name', 'active_till']
-      ]);
-      if ($test_maintenance) {
-         $test_maintenance = $test_maintenance[0];
-      }
+   // check if test maintenance exists
+   $result = API::Maintenance()->get([
+      'selectHosts' => ['hostid'],
+      'selectTimeperiods' => API_OUTPUT_EXTEND,
+      'filter' => ['name'=>'Testing maintenance'],
+      'output' => ['maintenanceid', 'name', 'active_till']
+   ]);
+   if ($result) {
+      $test_maintenance = $result[0];
    }
 
    if (!$test_maintenance) { # create new test maintenance
       $maintenance = [
          'name' => 'Testing maintenance',
-         'description' => 'Maintenance for testing tool',
+         'description' => 'Maintenance for testing tool. DO NOT REMOVE HOSTS.',
          'active_since' => $active_since_date,
          'active_till' => $active_till_date,
-         'timeperiods' => [
-            "timeperiod_type" => 0,
-            "period" => $year
+         'timeperiods' => [ 
+            "0"=> [
+               "timeperiod_type" => 0,
+               "period" => $year
+            ]
          ],
-         'hostids' => $hostid
+         'hostids' => [ $hostid ]
       ];
+      
       $result = API::Maintenance()->create($maintenance);
    
    } else { # update test maintenance
-      $hostids = $test_maintenance['hostids'];
+      $hosts = $test_maintenance['hosts'];
+      $hostids = [];
+
+      foreach ($hosts as $host) {
+         $hostids[] = $host['hostid'];
+      }
       $hostids[] = $hostid;
+
       $maintenance = [
          'maintenanceid' => $test_maintenance['maintenanceid'],
          'hostids' => $hostids
@@ -205,58 +215,46 @@ function enable_test_maintenance($hostid, $in_maintenance) {
 }
 
 /**
- * Remove test maintenance on host (only if there is no items to test)
+ * Remove host from test maintenance 
+ * (and delete test maintenance if there is no hosts left)
  *
  * @param string $hostid   host to start testing
  * 
  * @return bool
  */
-function remove_test_maintenance($hostid) {
+function remove_from_test_maintenance($hostid) {
    $test_maintenance = API::Maintenance()->get([
       'selectHosts' => ['hostid'],
       'selectTimeperiods' => API_OUTPUT_EXTEND,
       'filter' => ['name'=>'Testing maintenance'],
       'output' => ['maintenanceid', 'name', 'active_till']
    ]);
+
+   $old_hosts = $test_maintenance[0]['hosts'];
+   $new_hostids = [];
+
+   if(count($test_maintenance[0]['hosts']) > 1) {
+      foreach ($old_hosts as $value) {
+         
+         if($value['hostid'] != $hostid) {
+            $new_hostids[] = $value['hostid'];
+         }
+      }
+
+      $update_maintenance = [
+         'maintenanceid' => $test_maintenance[0]['maintenanceid'],
+         'hostids' => $new_hostids
+      ];
+
+      $result = API::Maintenance()->update($update_maintenance);
+
+   } else {
+      $remove_maintenance = [
+         $test_maintenance[0]['maintenanceid']
+      ];
+
+      $result = API::Maintenance()->delete($remove_maintenance);
+   }
+
+   return $result;
 }
-
-/*
-
-   array_merge(): Argument #2 is not an array [items.php:902 → convert_item_to_test() → enable_test_maintenance() → CApiWrapper->__call() → CFrontendApiWrapper->callMethod() → CApiWrapper->callMethod() → 
-   CFrontendApiWrapper->callClientMethod() → CLocalApiClient->callMethod() → CMaintenance->create() → array_merge() in include/classes/api/services/CMaintenance.php:270]
-
-   At least one host group or host must be selected. [items.php:902 → convert_item_to_test() → enable_test_maintenance() → CApiWrapper->__call() → CFrontendApiWrapper->callMethod() → CApiWrapper->callMethod() → 
-   CFrontendApiWrapper->callClientMethod() → CLocalApiClient->callMethod() → CMaintenance->create() → CApiService::exception() in include/classes/api/services/CMaintenance.php:279]
-*/
-
-
-
-
-/*
-{
-  "Form data": {
-    "sid": "5cb8c5e124738363",
-    "form_refresh": "3",
-    "form": "create",
-    "timeperiods[0][timeperiod_type]": "0",
-    "timeperiods[0][every]": "1",
-    "timeperiods[0][month]": "0",
-    "timeperiods[0][dayofweek]": "0",
-    "timeperiods[0][day]": "1",
-    "timeperiods[0][start_time]": "43200",
-    "timeperiods[0][start_date]": "2019-12-17+08:25",
-    "timeperiods[0][period]": "90000",
-    "mname": "twst",
-    "maintenance_type": "0",
-    "active_since": "2019-12-17+00:00",
-    "active_till": "2019-12-18+00:00",
-    "description": "sse",
-    "hostids[]": "10084",
-    "tags_evaltype": "0",
-    "tags[0][tag]": "",
-    "tags[0][operator]": "2",
-    "tags[0][value]": "",
-    "add": "Add"
-  }
-}
-*/

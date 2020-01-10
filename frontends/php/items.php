@@ -903,7 +903,7 @@ elseif (hasRequest('start')) {
 			if ($convert_result) {
 				show_message('Test started');
 			} else {
-            show_error_message('Failed to edit test item.');
+            show_error_message('Failed to enable testing.');
             remove_from_testing_table($item['itemid']);
 			}
 			unset($_REQUEST['itemid'], $_REQUEST['form']);
