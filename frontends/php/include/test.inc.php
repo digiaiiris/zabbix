@@ -94,13 +94,13 @@ function revert_test_to_original($test_item_id) {
       $response = API::Item()->update($item);
 
       if ($response) {
+         $result = remove_from_testing_table($test_item_id);
+         
          $sql_test_items_on_host = 'SELECT COUNT(hostid) AS "hosts" FROM item_testing WHERE hostid=' . zbx_dbstr($item['hostid']);
          $sql_result = DBselect($sql_test_items_on_host);
          $host_test_item_count = DBfetchArray($sql_result)[0]['hosts'];
 
-         $result = remove_from_testing_table($test_item_id);
-         
-         if ($result && $host_test_item_count < 2) {
+         if ($result && !($host_test_item_count > 0)) {
             remove_from_test_maintenance($item['hostid']);
          }
       }
@@ -148,7 +148,11 @@ function add_to_testing_table($item) {
  */
 function remove_from_testing_table($itemid) {
    $result = false;
-   $result = DB::delete('item_testing', array('itemid'=>$itemid));
+   try [
+      $result = DB::delete('item_testing', array('itemid'=>$itemid));
+   ] catch (Exception $e) {
+      $result = true;
+   }
 
    return $result;
 }
