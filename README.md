@@ -36,7 +36,7 @@ cd zabbix
 
 Add the original repository as an upstream remote repository:
 ```
-git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
+git remote add upstream git@github.com:zabbix/zabbix.git
 ```
 
 Verify that the remote repository has been added:
