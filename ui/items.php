@@ -1767,6 +1767,19 @@ elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && ha
 	// render view
 	echo (new CView('configuration.copy.elements', $data))->getOutput();
 }
+elseif (isset($_REQUEST['form']) && $_REQUEST['form'] == 'test') {
+   if (hasRequest('itemid')) {
+      $items = API::Item()->get([
+               'output' => ['itemid', 'type', 'hostid', 'name', 'key_', 'delay', 'value_type'],
+               'selectTriggers' => ['description','expression'],
+               'itemids' => getRequest('itemid')
+      ]);
+      $item = $items[0];
+
+      // render view
+      echo (new CView('configuration.item.test', $item))->getOutput();
+   }
+}
 // list of items
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
