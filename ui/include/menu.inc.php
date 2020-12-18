@@ -182,17 +182,17 @@ function getMainMenu(): CMenu {
 					(new CMenuItem(_('Queue')))
 						->setUrl(new CUrl('queue.php'), 'queue.php')
 				]))
-      );
-      
-      $menu->add(
-			(new CMenuItem(_('Iiris extensions')))
-            ->setId('iiris')
-            ->setIcon('icon-monitoring')
-            ->setSubMenu(new CMenu([
+		);
+		
+		$menu->add(
+			(new CMenuItem(_('Iiris Extensions')))
+				->setId('iiris')
+				->setIcon('icon-monitoring')
+				->setSubMenu(new CMenu([
                (new CMenuItem(_('Testing')))
-               ->setUrl(new CUrl('testing.php'), 'testing.php')
-            ]))
-      );
+               ->setAction('test.list')
+				]))
+		);
 	}
 
 	return $menu;

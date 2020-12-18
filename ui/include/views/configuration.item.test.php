@@ -81,4 +81,4 @@ $itemTab->setFooter(makeFormFooter(
 $form->addItem($itemTab);
 $widget->addItem($form);
 
-return $widget;
+$widget->show();
