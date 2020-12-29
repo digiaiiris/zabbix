@@ -192,7 +192,7 @@ function enable_test_maintenance($hostid) {
    if (!$test_maintenance) { # create new test maintenance
       $maintenance = [
          'name' => 'Testing maintenance',
-         'description' => 'Maintenance for testing tool. DO NOT REMOVE HOSTS.',
+         'description' => 'Maintenance for testing tool. Stop all testing on host(s) to remove. DO NOT REMOVE HOSTS MANUALLY!',
          'active_since' => $active_since_date,
          'active_till' => $active_till_date,
          'timeperiods' => [ 
