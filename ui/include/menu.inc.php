@@ -189,8 +189,8 @@ function getMainMenu(): CMenu {
 				->setId('iiris')
 				->setIcon('icon-monitoring')
 				->setSubMenu(new CMenu([
-               (new CMenuItem(_('Testing')))
-               ->setAction('test.list')
+					(new CMenuItem(_('Testing')))
+					->setAction('test.list')
 				]))
 		);
 	}

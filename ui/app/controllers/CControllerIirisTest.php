@@ -54,27 +54,6 @@ class CControllerIirisTest extends CController {
 		$data['sort'] = "item";
 		$data['sortorder'] = "ASC";
 
-	/*
-		$result_ids = DBselect('SELECT itemid FROM item_testing;');
-		$itemIds = DBfetchColumn($result_ids, 'itemid');
-		$itemTriggerIds = API::Item()->get([
-			'output' => ['itemid'],
-			'selectTriggers' => ['triggerid'],
-			'itemids' => $itemIds
-		]);
-		// echo '<script>console.log('. json_encode( $itemTriggerIds ) .')</script>';
-
-
-		$data['itemTriggers'] = API::Trigger()->get([
-			'triggerids' => $itemTriggerIds,
-			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
-				'status', 'state', 'error', 'templateid', 'flags'
-			],
-			'selectHosts' => ['hostid', 'name', 'host'],
-			'preservekeys' => true
-		]);
-	*/
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Item Testing'));
 		$this->setResponse($response);
