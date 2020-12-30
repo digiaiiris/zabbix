@@ -19,20 +19,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-// require_once dirname(__FILE__).'/include/config.inc.php';
-// $page['title'] = _('Item Testing');
-// $page['file'] = 'testing.php';
-// $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-// require_once dirname(__FILE__).'/include/page_header.php';
-
 $widget = (new CWidget())
 	->setTitle(_('Items in testing'))
 	->setControls((new CList())
 		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
 	)
 ;
-
-//$widget->addItem($data['main_filter']); 
 
 // create form
 $itemForm = (new CForm())->setName('items');
@@ -56,13 +48,6 @@ $itemTable = (new CTableInfo())
 
 foreach ($data['items'] as $item) {
 
-/*
-	// get item triggerids
-	$item['triggers'] = API::Item()->get([
-		'selectTriggers' => ['triggerid'],
-		'itemids' => $item['itemid']
-	]);
-*/
 	// host name
 	$host = (new CLink(CHtml::encode(
 			$item['hostname']
@@ -76,62 +61,7 @@ foreach ($data['items'] as $item) {
 		),
 		'items.php?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
 	));
-/*
-	// triggers info
-	$triggerHintTable = (new CTableInfo())->setHeader([_('Name'), _('Expression'), _('Status'), _('Value')]);
 
-	foreach ($item['triggers'] as $num => &$trigger) {
-			$trigger = $data['itemTriggers'][$trigger['triggerid']];
-
-			$trigger_description = [];
-
-			$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-
-			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-						$trigger_description[] = new CSpan(CHtml::encode($trigger['description']));
-			}
-			else {
-						$trigger_description[] = new CLink(
-									CHtml::encode($trigger['description']),
-									'triggers.php?form=update&hostid='.key($trigger['hosts']).'&triggerid='.$trigger['triggerid']
-						);
-			}
-
-			if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-						$trigger['error'] = '';
-			}
-
-			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-						$expression = [
-									_('Problem'), ': ', $trigger['expression'], BR(),
-									_('Recovery'), ': ', $trigger['recovery_expression']
-						];
-			}
-			else {
-						$expression = $trigger['expression'];
-			}
-
-			$triggerHintTable->addRow([
-						$trigger_description,
-						$expression,
-						(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state'])),
-	$trigger['value']
-			]);
-	}
-	unset($trigger);
-
-	if ($triggerHintTable->getNumRows()) {
-			$triggerInfo = (new CLinkAction(_('Triggers')))->setHint($triggerHintTable);
-			$triggerInfo = [$triggerInfo];
-			$triggerInfo[] = CViewHelper::showNum($triggerHintTable->getNumRows());
-
-			$triggerHintTable = [];
-	}
-	else {
-			$triggerInfo = '';
-	}
-*/
 	// stop testing button
 	$style = ITEM_STATUS_DISABLED;
 	$testBtn = new CLink( _('Stop'), 'items.php?group_itemid[]='.$item['itemid'].'&action=test.stop');
@@ -161,5 +91,3 @@ $itemForm->addItem($itemTable);
 $widget->addItem($itemForm);
 
 $widget->show();
-
-//require_once dirname(__FILE__).'/include/page_footer.php';
