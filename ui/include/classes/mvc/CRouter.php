@@ -177,6 +177,7 @@ class CRouter {
 		'script.update'					=> ['CControllerScriptUpdate',						null,					null],
 		'search'						=> ['CControllerSearch',							'layout.htmlpage',		'search'],
 		'system.warning'				=> ['CControllerSystemWarning',						'layout.warning',		'system.warning'],
+		'test.list'					=> ['CControllerIirisTest',						'layout.htmlpage',		'iiris.test.list'],
 		'timeselector.update'			=> ['CControllerTimeSelectorUpdate',				'layout.json',			null],
 		'trigdisplay.edit'				=> ['CControllerTrigDisplayEdit',					'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.reset'				=> ['CControllerTrigDisplayReset',					null,					null],
