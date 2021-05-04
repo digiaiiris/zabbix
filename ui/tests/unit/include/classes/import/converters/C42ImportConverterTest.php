@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,11 @@
 **/
 
 
+use PHPUnit\Framework\TestCase;
+
 class C42ImportConverterTest extends CImportConverterTest {
 
-	public function testConvertProvider() {
+	public function dataProviderConvert() {
 		return [
 			[
 				[
@@ -104,7 +106,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 										'name' => 'Clock'
 									],
 									'max_columns' => 3
-								],
+								]
 							]
 						]
 					]
@@ -136,7 +138,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 						[
 							'name' => 'Parent screen 2',
 							'hsize' => 1,
-							'vsize' => 4,
+							'vsize' => 4
 						],
 						[
 							'name' => 'Child screen',
@@ -161,7 +163,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					]
-				],
+				]
 			],
 			[
 				[
@@ -208,7 +210,7 @@ class C42ImportConverterTest extends CImportConverterTest {
 	}
 
 	/**
-	 * @dataProvider testConvertProvider
+	 * @dataProvider dataProviderConvert
 	 *
 	 * @param $data
 	 * @param $expected

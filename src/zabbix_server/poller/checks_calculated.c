@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "zbxserver.h"
 #include "log.h"
 #include "../../libs/zbxserver/evalfunc.h"
+#include "valuecache.h"
 
 typedef struct
 {
@@ -297,6 +298,8 @@ static int	calcitem_evaluate_expression(expression_t *exp, char *error, size_t m
 		zbx_free(exp->exp);
 		exp->exp = buf;
 	}
+
+	zbx_vc_flush_stats();
 
 	DCconfig_clean_items(items, errcodes, exp->functions_num);
 

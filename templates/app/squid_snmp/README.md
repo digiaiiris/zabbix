@@ -21,11 +21,11 @@ snmp_access allow <zbx_acl_name> <zabbix_server_ip>
 ```
 
 ### Setup Zabbix
-1\. [Import](https://www.zabbix.com/documentation/current/manual/xml_export_import/templates) the template [template_app_squid_snmp.xml](template_app_squid_snmp.xml) into Zabbix.
+1\. [Import](https://www.zabbix.com/documentation/5.0/manual/xml_export_import/templates) the template [template_app_squid_snmp.xml](template_app_squid_snmp.xml) into Zabbix.
 
 2\. Set values for {$SQUID.SNMP.COMMUNITY}, {$SQUID.SNMP.PORT} and {$SQUID.HTTP.PORT} as configured in squid.conf.
 
-3\. [Link](https://www.zabbix.com/documentation/current/manual/config/templates/linking) the imported template to a host with Squid.
+3\. [Link](https://www.zabbix.com/documentation/5.0/manual/config/templates/linking) the imported template to a host with Squid.
 
 4\. Add SNMPv2 interface to Squid host. Set **Port** as {$SQUID.SNMP.PORT} and **SNMP community** as {$SQUID.SNMP.COMMUNITY}.
 
@@ -38,9 +38,9 @@ No specific Zabbix configuration is required.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SQUID.FILE.DESC.WARN.MIN} |<p>The threshold for minimum number of avaliable file descriptors</p> |`100` |
+|{$SQUID.FILE.DESC.WARN.MIN} |<p>The threshold for minimum number of available file descriptors</p> |`100` |
 |{$SQUID.HTTP.PORT} |<p>http_port configured in squid.conf (Default: 3128)</p> |`3128` |
-|{$SQUID.PAGE.FAULT.WARN} |<p>The threshold for sys page faults rate in percent of recieved HTTP requests</p> |`90` |
+|{$SQUID.PAGE.FAULT.WARN} |<p>The threshold for sys page faults rate in percent of received HTTP requests</p> |`90` |
 |{$SQUID.SNMP.COMMUNITY} |<p>SNMP community allowed by ACL in squid.conf</p> |`public` |
 |{$SQUID.SNMP.PORT} |<p>snmp_port configured in squid.conf (Default: 3401)</p> |`3401` |
 
@@ -120,7 +120,7 @@ There are no template links in this template.
 |Squid: Swap usage is more than low watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapLowWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |WARNING | |
 |Squid: Swap usage is more than high watermark (>{ITEM.VALUE2}%) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentSwapSize].last()}>{Squid SNMP:squid[cacheSwapHighWM].last()}*{Squid SNMP:squid[cacheSwapMaxSize].last()}/100` |HIGH | |
 |Squid: Squid is running out of file descriptors (<{$SQUID.FILE.DESC.WARN.MIN}) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheCurrentUnusedFDescrCnt].last()}<{$SQUID.FILE.DESC.WARN.MIN}` |WARNING | |
-|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of recieved HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
+|Squid: High sys page faults rate (>{$SQUID.PAGE.FAULT.WARN}% of received HTTP requests) |<p>-</p> |`{TEMPLATE_NAME:squid[cacheSysPageFaults].avg(5m)}>{Squid SNMP:squid[cacheProtoClientHttpRequests].avg(5m)}/100*{$SQUID.PAGE.FAULT.WARN}` |WARNING | |
 
 ## Feedback
 

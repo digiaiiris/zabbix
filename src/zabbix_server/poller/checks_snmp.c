@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -642,7 +642,7 @@ static void	zbx_snmp_close_session(struct snmp_session *session)
 static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type)
 {
 	const char	*hint;
-	char		buffer[MAX_STRING_LEN];
+	char		buffer[MAX_BUFFER_LEN];
 	char		*strval_dyn = NULL;
 	struct tree	*subtree;
 	unsigned char	type;
@@ -704,6 +704,8 @@ static int	zbx_snmp_set_result(const struct variable_list *var, AGENT_RESULT *re
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d", __func__, (int)var->type);
+
+	*string_type = ZBX_SNMP_STR_UNDEFINED;
 
 	if (ASN_OCTET_STR == var->type || ASN_OBJECT_ID == var->type)
 	{
@@ -809,6 +811,7 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 	oid	parsed_oid[MAX_OID_LEN];
 	size_t	parsed_oid_len = MAX_OID_LEN;
 	char	printed_oid[MAX_STRING_LEN];
+	char	*printed_oid_escaped;
 
 	/**************************************************************************************************************/
 	/*                                                                                                            */
@@ -878,11 +881,15 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 		return SUCCEED;
 	}
 
-	if (NULL == snmp_parse_oid(printed_oid, parsed_oid, &parsed_oid_len))
+	printed_oid_escaped = zbx_dyn_escape_string(printed_oid, "\\");
+
+	if (NULL == snmp_parse_oid(printed_oid_escaped, parsed_oid, &parsed_oid_len))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot parse OID '%s'", __func__, printed_oid);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot parse OID '%s'", __func__, printed_oid_escaped);
+		zbx_free(printed_oid_escaped);
 		goto numeric;
 	}
+	zbx_free(printed_oid_escaped);
 
 	if (parsed_oid_len == objid_len && 0 == memcmp(parsed_oid, objid, parsed_oid_len * sizeof(oid)))
 	{
@@ -1193,11 +1200,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 
 				if (SUCCEED == zbx_snmp_set_result(var, &snmp_result, &val_type))
 				{
-					if (ISSET_TEXT(&snmp_result) &&
-							0 != ((ZBX_SNMP_STR_HEX | ZBX_SNMP_STR_STRING) & val_type))
-					{
+					if (ISSET_TEXT(&snmp_result) && ZBX_SNMP_STR_HEX == val_type)
 						zbx_remove_chars(snmp_result.text, "\r\n");
-					}
 
 					str_res = GET_STR_RESULT(&snmp_result);
 				}
@@ -1259,6 +1263,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
 	struct variable_list	*var;
+	unsigned char		val_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __func__, num, level);
 
@@ -1381,13 +1386,12 @@ retry:
 			/* process received data */
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
-			{
-				(void)zbx_snmp_set_result(var, &results[j], NULL);
-			}
+				(void)zbx_snmp_set_result(var, &results[j], &val_type);
 			else
-			{
-				errcodes[j] = zbx_snmp_set_result(var, &results[j], NULL);
-			}
+				errcodes[j] = zbx_snmp_set_result(var, &results[j], &val_type);
+
+			if (ISSET_TEXT(&results[j]) && ZBX_SNMP_STR_HEX == val_type)
+				zbx_remove_chars(results[j].text, "\r\n");
 		}
 
 		if (SUCCEED == ret)

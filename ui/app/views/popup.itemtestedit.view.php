@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,15 +105,14 @@ if ($data['is_item_testable']) {
 			'host_address_row'
 		)
 		->addRow(
-			new CLabel(_('Proxy'), 'proxy_hostid'),
-			$data['proxies_enabled']
-				? (new CComboBox('proxy_hostid',
-						array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0, null,
-						[0 => _('(no proxy)')] + $data['proxies']))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				: (new CTextBox(null, _('(no proxy)'), true))
-					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-					->setId('proxy_hostid'), // Automated tests need this.
+			new CLabel(_('Proxy'), 'label-proxy-hostid'),
+			(new CSelect('proxy_hostid'))
+				->setReadonly(!$data['proxies_enabled'])
+				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
+				->setFocusableElementId('label-proxy-hostid')
+				->setValue(array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0)
+				->setId('proxy_hostid')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			'proxy_hostid_row'
 		)
 		->addRow(null, null, 'empty_row_1');
@@ -209,7 +208,7 @@ if (count($data['steps']) > 0) {
 			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
 
 		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON) {
+		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON || $step['type'] == ZBX_PREPROC_VALIDATE_RANGE) {
 			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
 		}
 		else {
@@ -218,7 +217,9 @@ if (count($data['steps']) > 0) {
 
 		$result_table->addRow([
 			$step['num'].':',
-			(new CCol($step['name']))->setId('preproc-test-step-'.$i.'-name'),
+			(new CCol($step['name']))
+				->setId('preproc-test-step-'.$i.'-name')
+				->addClass(ZBX_STYLE_WORDBREAK),
 			(new CCol())
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result')
@@ -269,7 +270,7 @@ $templates = [
 			(new CDiv(
 				(new CSpan('#{result}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{result}', 'hintbox-scrollable', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px;')
+					->setHint('#{result}', 'hintbox-wrap')
 			))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -283,7 +284,7 @@ $templates = [
 				(new CDiv(
 					(new CSpan('#{failed}'))
 						->addClass(ZBX_STYLE_LINK_ACTION)
-						->setHint('#{failed}', '', true, 'max-width:'.ZBX_ACTIONS_POPUP_MAX_WIDTH.'px; ')
+						->setHint('#{failed}', 'hintbox-wrap')
 				))
 					->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)

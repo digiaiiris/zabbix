@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1186,9 +1186,9 @@ static int	DBget_dhost_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 	result = DBselectN(sql, 1);
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -1316,9 +1316,9 @@ static int	DBget_drule_value_by_event(const DB_EVENT *event, char **replace_to, 
 			return ret;
 	}
 
-	if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
+	if (NULL != (row = DBfetch(result)))
 	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -1352,6 +1352,8 @@ static int	DBget_history_log_value(zbx_uint64_t itemid, char **replace_to, int r
 
 	if (SUCCEED != zbx_vc_get_value(itemid, item.value_type, &ts, &value))
 		goto out;
+
+	zbx_vc_flush_stats();
 
 	switch (request)
 	{
@@ -1464,6 +1466,7 @@ static int	DBitem_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_
 		{
 			char	tmp[MAX_BUFFER_LEN];
 
+			zbx_vc_flush_stats();
 			zbx_history_value_print(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
 
@@ -1794,13 +1797,7 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 
 	if (NULL != (row = DBfetch(result)))
 	{
-		if (SUCCEED == DBis_null(row[0]))
-		{
-			zbx_free(*replace_to);
-		}
-		else
-			*replace_to = zbx_strdup(*replace_to, row[0]);
-
+		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
 		ret = SUCCEED;
 	}
 	DBfree_result(result);
@@ -2516,18 +2513,31 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			if (SUCCEED == zbx_str_extract(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX),
 					strlen(macro) - ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX) - 1, &name))
 			{
-				int	i;
-
-				for (i = 0; i < event->tags.values_num; i++)
+				if (0 < event->tags.values_num)
 				{
-					zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+					int			i;
+					zbx_tag_t       	*tag;
+					zbx_vector_ptr_t	ptr_tags;
 
-					if (0 == strcmp(name, tag->tag))
+					zbx_vector_ptr_create(&ptr_tags);
+					zbx_vector_ptr_append_array(&ptr_tags, event->tags.values,
+							event->tags.values_num);
+					zbx_vector_ptr_sort(&ptr_tags, compare_tags);
+
+					for (i = 0; i < ptr_tags.values_num; i++)
 					{
-						*replace_to = zbx_strdup(*replace_to, tag->value);
-						break;
+						tag = (zbx_tag_t *)ptr_tags.values[i];
+
+						if (0 == strcmp(name, tag->tag))
+						{
+							*replace_to = zbx_strdup(*replace_to, tag->value);
+							break;
+						}
 					}
+
+					zbx_vector_ptr_destroy(&ptr_tags);
 				}
+
 				zbx_free(name);
 			}
 		}
@@ -2842,7 +2852,6 @@ static void	resolve_opdata(const DB_EVENT *event, char **replace_to, char *error
 						else
 							*replace_to = zbx_strdcat(*replace_to, STR_UNKNOWN_VARIABLE);
 					}
-
 					ZBX_FALLTHROUGH;
 				case ZBX_TOKEN_USER_MACRO:
 				case ZBX_TOKEN_SIMPLE_MACRO:
@@ -4664,6 +4673,8 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 		pos++;
 	}
 
+	zbx_vc_flush_stats();
+
 	zbx_free(user_alias);
 	zbx_free(user_name);
 	zbx_free(user_surname);
@@ -5158,6 +5169,8 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, zbx_vector_ptr_t *
 			func->value = zbx_strdup(func->value, buffer);
 		}
 	}
+
+	zbx_vc_flush_stats();
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
 	zbx_vector_uint64_destroy(&itemids);

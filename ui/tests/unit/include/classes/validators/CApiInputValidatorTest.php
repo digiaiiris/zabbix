@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,9 @@
 **/
 
 
-class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CApiInputValidatorTest extends TestCase {
 
 	public function dataProviderInput() {
 		return [
@@ -841,31 +843,31 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_FLOAT],
 				1.23E+11,
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'1.23E+11',
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'1.23e+11',
 				'/1/float',
-				1.23E+11,
+				1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'-1.23e+11',
 				'/1/float',
-				-1.23E+11,
+				-1.23E+11
 			],
 			[
 				['type' => API_FLOAT],
 				'.23E11',
 				'/1/float',
-				0.23E+11,
+				0.23E+11
 			],
 			[
 				['type' => API_FLOATS],
@@ -1179,6 +1181,20 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				],
 				'/',
 				'Invalid parameter "/": the parameter "name" is missing.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'roles' => ['type' => API_OBJECT, 'default' => [], 'fields' => [
+						'value' => ['type' => API_STRING_UTF8, 'default' => 'test']
+					]]
+				]],
+				[],
+				'/',
+				[
+					'roles' => [
+						'value' => 'test'
+					]
+				]
 			],
 			[
 				['type' => API_IDS],
@@ -1497,7 +1513,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_OBJECT, 'fields' => [
 					'tags' => ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
-						'tag'	=> ['type' => API_STRING_UTF8],
+						'tag'	=> ['type' => API_STRING_UTF8]
 					]]
 				]],
 				[
@@ -1618,7 +1634,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 			[
 				['type' => API_OBJECTS, 'fields' => [
 					'host' =>	['type' => API_H_NAME, 'flags' => API_REQUIRED],
-					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host'],
+					'name' =>	['type' => API_STRING_UTF8, 'default_source' => 'host']
 				]],
 				[
 					['host' => 'host 0'],
@@ -1894,13 +1910,13 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'.124',
 				'/1/numeric',
-				'0.124',
+				'0.124'
 			],
 			[
 				['type' => API_NUMERIC],
 				'-.124',
 				'/1/numeric',
-				'-0.124',
+				'-0.124'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3083,6 +3099,144 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				'/1/url',
 				'text{EVENT.TAGS."JIRAID"}text'
 			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				null,
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/expression',
+				'Invalid parameter "/1/expression": cannot be empty.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				[],
+				'/1/expression',
+				'Invalid parameter "/1/expression": a character string is expected.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'length' => 10],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": value is too long.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last() = 0',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from "{host:item.last() = 0".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'9 and 1',
+				'/1/expression',
+				'Invalid parameter "/1/expression": trigger expression must contain at least one host:key reference.'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'Invalid parameter "/1/expression": incorrect trigger expression starting from " {#LLD_MACRO}".'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION, 'flags' => API_ALLOW_LLD_MACRO],
+				'{host:item.last()} = {#LLD_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {#LLD_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = 0',
+				'/1/expression',
+				'{host:item.last()} = 0'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'{host:item.last()} = {$USER_MACRO}',
+				'/1/expression',
+				'{host:item.last()} = {$USER_MACRO}'
+			],
+			[
+				['type' => API_TRIGGER_EXPRESSION],
+				'',
+				'/1/expression',
+				''
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				[],
+				'/params',
+				[]
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				1,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				true,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				'23',
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_PARAMS],
+				null,
+				'/params',
+				'Invalid parameter "/params": an array or object is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				[],
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'id',
+				'/id',
+				'id'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				1,
+				'/id',
+				1
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				true,
+				'/id',
+				'Invalid parameter "/id": a string, number or null value is expected.'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				'23',
+				'/id',
+				'23'
+			],
+			[
+				['type' => API_JSONRPC_ID],
+				null,
+				'/id',
+				null
+			]
 		];
 	}
 
@@ -3092,7 +3246,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'9.99999999999999E+15',
 				'/1/numeric',
-				'9.99999999999999E+15',
+				'9.99999999999999E+15'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3104,7 +3258,7 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'-9.99999999999999E+15',
 				'/1/numeric',
-				'-9.99999999999999E+15',
+				'-9.99999999999999E+15'
 			],
 			[
 				['type' => API_NUMERIC],
@@ -3116,25 +3270,25 @@ class CApiInputValidatorTest extends PHPUnit_Framework_TestCase {
 				['type' => API_NUMERIC],
 				'10000000000.0001',
 				'/1/numeric',
-				'10000000000.0001',
+				'10000000000.0001'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1.00001',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1E-4',
 				'/1/numeric',
-				'1E-4',
+				'1E-4'
 			],
 			[
 				['type' => API_NUMERIC],
 				'1E-5',
 				'/1/numeric',
-				'Invalid parameter "/1/numeric": a number has too many fractional digits.',
+				'Invalid parameter "/1/numeric": a number has too many fractional digits.'
 			]
 		];
 	}

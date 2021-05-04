@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
+
+class CTriggerExpressionTest extends TestCase {
 
 	public static function provider() {
 		return [
@@ -3327,7 +3329,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 							'function' => 'str(ГУГЛ)',
 							'functionName' => 'str',
 							'functionParams' => ['ГУГЛ']
-						],
+						]
 					],
 					[
 						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,
@@ -3421,7 +3423,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						'data' => null,
 						'pos' => 137,
 						'length' => 1
-					],
+					]
 				]
 			],
 			[
@@ -3465,7 +3467,7 @@ class CTriggerExpressionTest extends PHPUnit_Framework_TestCase {
 						'data' => [
 							'functionName' => 'str',
 							'functionParams' => ['host:item', 'ГУГЛ']
-						],
+						]
 					],
 					[
 						'type' => CTriggerExprParserResult::TOKEN_TYPE_OPERATOR,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -256,7 +256,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					'http_authentication' => [
 						'Enable HTTP authentication' => true,
 						'Default login form' => 'HTTP login form',
-						'Remove domain name' => 'local.com',
+						'Remove domain name' => 'local.com'
 					],
 					'pages' => [
 						[
@@ -418,7 +418,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 					'pages' => [
 						[
 							'page' => 'index_http.php',
-							'error' => 'You are not logged in',
+							'error' => 'You are not logged in'
 						]
 					],
 					'db_check'  => [
@@ -552,6 +552,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 			}
 
 			$this->page->logout();
+			$this->page->reset();
 			$this->page->open('index.php?form=default');
 		}
 	}
@@ -592,7 +593,7 @@ class testFormAdministrationAuthenticationHttp extends CLegacyWebTest {
 	private function setHttpConfiguration($data) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$this->assertEquals('Authentication', $this->query('tag:h1')->one()->getText());
-		$this->assertPageTitle('Configuration of authentication');
+		$this->page->assertTitle('Configuration of authentication');
 
 		// Fill fields in 'HTTP settings' tab.
 		$form = $this->query('name:form_auth')->asForm()->one();

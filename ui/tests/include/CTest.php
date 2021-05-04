@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
 require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
+require_once dirname(__FILE__).'/helpers/CDateTimeHelper.php';
 
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
@@ -213,6 +214,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 		$callbacks = $this->getAnnotationTokensByName($class_annotations, 'on-before');
 		if (!self::executeCallbacks($this, $callbacks)) {
 			self::markTestSuiteSkipped();
+			throw new Exception(implode("\n", static::$warnings));
 
 			return;
 		}
@@ -350,7 +352,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 
 		DBclose();
 
-		if (self::$warnings) {
+		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && self::$warnings) {
 			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
 		}
 
@@ -401,7 +403,7 @@ class CTest extends PHPUnit_Framework_TestCase {
 	 * @param string $warning    warning text
 	 */
 	public static function addWarning($warning) {
-		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && !in_array($warning, self::$warnings)) {
+		if (!in_array($warning, self::$warnings)) {
 			self::$warnings[] = $warning;
 		}
 	}

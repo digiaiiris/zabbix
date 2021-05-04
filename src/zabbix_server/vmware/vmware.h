@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -246,6 +246,10 @@ typedef struct
 
 	/* the vmware service instance version */
 	char				*version;
+
+	/* the vmware service instance version numeric */
+	unsigned short			major_version;
+	unsigned short			minor_version;
 
 	/* the vmware service instance fullname */
 	char				*fullname;

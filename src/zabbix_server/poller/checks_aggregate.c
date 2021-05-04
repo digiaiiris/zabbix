@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -474,6 +474,8 @@ static int	evaluate_aggregate(const DC_ITEM *item, AGENT_RESULT *res, int grp_fu
 
 		zbx_history_record_vector_destroy(&values, items[i].value_type);
 	}
+
+	zbx_vc_flush_stats();
 
 	if (0 == group_values.values_num)
 	{

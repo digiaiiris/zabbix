@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,8 +83,11 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php?page=1');
 		$this->query('button:Reset')->one()->click();
 
-		// Check if template name present on page, if not, check on second page.
-		if ($this->query('link', $name)->one(false)->isValid() === false) {
+		// Check if template name present on page, if not, check on next page.
+		for ($i = 0; $i < 2; $i++) {
+			if ($this->query('link', $name)->one(false)->isValid() === true) {
+				break;
+			}
 			$this->query('xpath://div[@class="table-paging"]//span[@class="arrow-right"]/..')->one()->click();
 			$this->zbxTestWaitForPageToLoad();
 		}
@@ -172,9 +175,9 @@ class testPageTemplates extends CLegacyWebTest {
 						['name' => 'test', 'operator' => 'Contains', 'value' => 'test_tag']
 					],
 					'expected_templates' => [
-						'Form test template',
-						'Template with tags for cloning',
-						'Template with tags for updating'
+						'A template with tags for cloning',
+						'A template with tags for updating',
+						'Form test template'
 					]
 				]
 			],
@@ -183,12 +186,12 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Contains', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
-						'Form test template',
-						'Template with tags for cloning',
-						'Template with tags for updating'
+						'A template with tags for cloning',
+						'A template with tags for updating',
+						'Form test template'
 					]
 				]
 			],
@@ -196,7 +199,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE'],
+						['name' => 'tag', 'operator' => 'Equals', 'value' => 'TEMPLATE']
 					],
 					'expected_templates' => [
 						'Form test template'
@@ -207,12 +210,12 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Contains'],
+						['name' => 'action', 'operator' => 'Contains']
 					],
 					'expected_templates' => [
-						'Form test template',
-						'Template with tags for cloning',
-						'Template with tags for updating'
+						'A template with tags for cloning',
+						'A template with tags for updating',
+						'Form test template'
 					]
 				]
 			],
@@ -220,7 +223,7 @@ class testPageTemplates extends CLegacyWebTest {
 				[
 					'evaluation_type' => 'And/Or',
 					'tags' => [
-						['name' => 'action', 'operator' => 'Equals'],
+						['name' => 'action', 'operator' => 'Equals']
 					]
 				]
 			]
@@ -263,13 +266,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
 		// Check that Hosts page is opened.
-		$this->assertPageHeader('Hosts');
+		$this->page->assertHeader('Hosts');
 		$filter = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table->invalidate();
 		// Check that correct Hosts are filtered.
 		$this->assertEquals([$template], $filter->getField('Templates')->getValue());
 		$this->assertTableDataColumn($hosts);
-		$this->assertRowCount(count($hosts));
+		$this->assertTableStats(count($hosts));
 		// Reset Hosts filter after scenario.
 		$this->resetFilter();
 	}

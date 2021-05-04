@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class testFormTemplate extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => 'Test Template',
+					'name' => 'Selenium Test Template',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -46,7 +46,7 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'name' => 'Test Template name',
-					'visible_name' => 'Test template with visible name',
+					'visible_name' => 'Selenium Test template with visible name',
 					'group' => 'Linux servers',
 					'new_group' => 'Selenium new group',
 					'description' => 'template description',
@@ -57,10 +57,10 @@ class testFormTemplate extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Test Template',
+					'name' => 'Selenium Test Template',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template "Test Template" already exists.',
+						'Template "Selenium Test Template" already exists.'
 					]
 
 				]
@@ -69,10 +69,10 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => 'Existing visible name',
-					'visible_name' => 'Test template with visible name',
+					'visible_name' => 'Selenium Test template with visible name',
 					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Template with the same visible name "Test template with visible name" already exists.',
+						'Template with the same visible name "Selenium Test template with visible name" already exists.'
 					]
 
 				]
@@ -83,7 +83,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'name' => '',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Incorrect value for field "Template name": cannot be empty.',
+						'Incorrect value for field "Template name": cannot be empty.'
 					]
 
 				]
@@ -95,7 +95,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'remove_group' => 'Templates',
 					'error_msg' => 'Page received incorrect data',
 					'errors' => [
-						'Field "groups" is mandatory.',
+						'Field "groups" is mandatory.'
 					]
 
 				]
@@ -271,7 +271,7 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(66, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(11, CDBHelper::getCount("SELECT applicationid FROM applications WHERE hostid='".$template['hostid']."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostgroupid FROM hosts_groups WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(2, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
+		$this->assertEquals(1, CDBHelper::getCount("SELECT screenid FROM screens WHERE templateid='".$template['hostid']."'"));
 	}
 
 		public function testFormTemplate_Delete() {

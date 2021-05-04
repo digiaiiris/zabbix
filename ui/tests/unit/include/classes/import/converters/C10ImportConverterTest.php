@@ -1,7 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+use PHPUnit\Framework\TestCase;
 
 class C10ImportConverterTest extends CImportConverterTest {
 
@@ -47,8 +49,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'Host 2',
 					'status' => HOST_STATUS_MONITORED
-				],
-			],
+				]
+			]
 		]);
 
 		$expectedResult = $this->createExpectedResult([
@@ -74,17 +76,17 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			],
 			'templates' => [
 				[
 					'template' => 'Template 1',
-					'name' => 'Template 1',
+					'name' => 'Template 1'
 				],
 				[
 					'template' => 'Template 2',
 					'name' => 'Template 2'
-				],
+				]
 			]
 		]);
 
@@ -103,25 +105,25 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_MONITORED,
 					'groups' => [
 						'Zabbix server',
-						'Linux server',
-					],
+						'Linux server'
+					]
 				],
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'groups' => [
 						'Zabbix server',
-						'My group',
-					],
+						'My group'
+					]
 				],
 				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
 					'groups' => [
-						'Templates',
-					],
-				],
-			],
+						'Templates'
+					]
+				]
+			]
 		]);
 
 		$result = $this->createExpectedResult([
@@ -137,7 +139,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'name' => 'Templates'
-				],
+				]
 			],
 			'hosts' => [
 				[
@@ -164,7 +166,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'name' => 'Linux server'
-						],
+						]
 					],
 					'proxy' => [
 						'name' => ''
@@ -183,12 +185,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'name' => 'My group'
-						],
+						]
 					],
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			],
 			'templates' => [
 				[
@@ -220,12 +222,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host2',
-					'status' => HOST_STATUS_MONITORED,
-				],
+					'status' => HOST_STATUS_MONITORED
+				]
 			]
 		]);
 		$result = $this->createExpectedResult([
@@ -251,7 +253,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			]
 		]);
 		$this->assertConvert($result, $source);
@@ -262,7 +264,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				// host with an agent interface
 				[
@@ -290,7 +292,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
 					'useip' => 1,
-					'ip' => '127.0.0.1',
+					'ip' => '127.0.0.1'
 				],
 				// host with an IPMI interface
 				[
@@ -359,7 +361,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'key' => 'item5',
 							'type' => ITEM_TYPE_SNMPV3,
 							'description' => 'item5'
-						],
+						]
 					]
 				],
 				// missing item type
@@ -369,7 +371,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item1',
-							'description' => 'item1',
+							'description' => 'item1'
 						]
 					]
 				]
@@ -466,7 +468,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '123',
 							'default' => INTERFACE_PRIMARY,
 							'interface_ref' => 'if0'
-						],
+						]
 					],
 					'items' => [
 						[
@@ -503,7 +505,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '123',
 							'default' => INTERFACE_PRIMARY,
 							'interface_ref' => 'if0'
-						],
+						]
 					],
 					'items' => [
 						[
@@ -558,7 +560,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'port' => '3',
 							'default' => INTERFACE_SECONDARY,
 							'interface_ref' => 'if2'
-						],
+						]
 					],
 					'items' => [
 						[
@@ -615,7 +617,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
 							'snmpv3_privprotocol' => ''
-						],
+						]
 					],
 					'proxy' => [
 						'name' => ''
@@ -637,7 +639,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'inventory_link' => '',
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
-							'snmpv3_privprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						]
 					],
 					'name' => 'host7',
@@ -656,13 +658,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'host_profile' => [],
-					'host_profiles_ext' => [],
+					'host_profiles_ext' => []
 				],
 				[
 					'name' => 'host1',
@@ -678,7 +680,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'software' => 'software',
 						'contact' => 'contact',
 						'location' => 'location',
-						'notes' => 'notes',
+						'notes' => 'notes'
 					],
 					'host_profiles_ext' => [
 						'device_alias' => 'device alias',
@@ -738,7 +740,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'poc_2_phone_2' => 'poc 2 phone 2',
 						'poc_2_cell' => 'poc 2 cell',
 						'poc_2_screen' => 'poc 2 screen',
-						'poc_2_notes' => 'poc 2 notes',
+						'poc_2_notes' => 'poc 2 notes'
 					]
 				]
 			]
@@ -840,7 +842,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						'poc_2_phone_b' => 'poc 2 phone 2',
 						'poc_2_cell' => 'poc 2 cell',
 						'poc_2_screen' => 'poc 2 screen',
-						'poc_2_notes' => 'poc 2 notes',
+						'poc_2_notes' => 'poc 2 notes'
 					],
 					'name' => 'host1',
 					'proxy' => [
@@ -858,7 +860,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host1',
@@ -871,7 +873,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item',
-							'description' => 'item',
+							'description' => 'item'
 						],
 						[
 							'key' => 'item',
@@ -883,7 +885,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'description' => 'My item',
 							'applications' => [
 								'Application 1',
-								'Application 2',
+								'Application 2'
 							]
 						]
 					]
@@ -894,14 +896,14 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'items' => [
 						[
 							'key' => 'item',
-							'description' => 'item',
+							'description' => 'item'
 						],
 						[
 							'key' => 'ftp,1',
 							'description' => 'My item',
 							'applications' => [
 								'Application 1',
-								'Application 2',
+								'Application 2'
 							]
 						]
 					]
@@ -949,7 +951,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'inventory_link' => '',
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
-							'snmpv3_privprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'key' => 'item',
@@ -960,7 +962,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'inventory_link' => '',
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
-							'snmpv3_privprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'name' => 'My item',
@@ -978,7 +980,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'inventory_link' => '',
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
-							'snmpv3_privprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						]
 					],
 					'applications' => [
@@ -1009,7 +1011,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'inventory_link' => '',
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
-							'snmpv3_privprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						],
 						[
 							'name' => 'My item',
@@ -1028,7 +1030,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'inventory_link' => '',
 							'snmpv3_contextname' => '',
 							'snmpv3_authprotocol' => '',
-							'snmpv3_privprotocol' => '',
+							'snmpv3_privprotocol' => ''
 						]
 					],
 					'applications' => [
@@ -1051,7 +1053,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host2',
@@ -1074,7 +1076,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'Macro trigger',
 							'expression' => '{{HOSTNAME}:item.last(0)}>0&{{HOST.HOST}:item.last(0)}>0'
-						],
+						]
 					]
 				],
 				[
@@ -1098,7 +1100,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						]
 					]
 				]
-			],
+			]
 		]);
 
 		$expectedResult = $this->createExpectedResult([
@@ -1119,7 +1121,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'My trigger 2',
 					'expression' => '{template:item.last(0)}>0'
-				],
+				]
 			],
 			'hosts' => [
 				[
@@ -1203,17 +1205,17 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host2',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				]
 			],
 			'dependencies' => [
 				[
 					'description' => 'host1:trigger',
-					'depends' => 'host2:trigger',
+					'depends' => 'host2:trigger'
 				]
 			]
 		]);
@@ -1240,7 +1242,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			]
 		]);
 		$this->assertConvert($expectedResult, $source);
@@ -1251,7 +1253,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'triggers' => [],
+					'triggers' => []
 				],
 				[
 					'name' => 'host2',
@@ -1261,7 +1263,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'description' => 'trigger',
 							'expression' => '{host2:item.last()}>0'
 						]
-					],
+					]
 				],
 				[
 					'name' => 'host3',
@@ -1271,23 +1273,23 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'description' => 'trigger2',
 							'expression' => '{host3:item.last()}>0'
 						]
-					],
+					]
 				]
 			],
 			'dependencies' => [
 				[
 					'description' => 'host1:trigger',
-					'depends' => 'host1:trigger2',
+					'depends' => 'host1:trigger2'
 				],
 				// target trigger missing
 				[
 					'description' => 'host2:trigger',
-					'depends' => 'host2:trigger2',
+					'depends' => 'host2:trigger2'
 				],
 				// source trigger missing
 				[
 					'description' => 'host3:trigger',
-					'depends' => 'host3:trigger2',
+					'depends' => 'host3:trigger2'
 				]
 			]
 		]);
@@ -1300,7 +1302,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'trigger2',
 					'expression' => '{host3:item.last()}>0'
-				],
+				]
 			],
 			'hosts' => [
 				[
@@ -1335,7 +1337,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			]
 		]);
 		$this->assertConvert($expectedResult, $source);
@@ -1349,7 +1351,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'common-trigger',
 							'expression' => '{host1:item.last(0)}>0&{host2:item.last(0)}'
-						],
+						]
 					]
 				],
 				// check the case when hosts are in a different order than in the expression
@@ -1364,7 +1366,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'dep-trigger',
 							'expression' => '{host1:item.last(0)}'
-						],
+						]
 					]
 				],
 				[
@@ -1374,7 +1376,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'common-trigger',
 							'expression' => '{template1:item.last(0)}>0&{template2:item.last(0)}'
-						],
+						]
 					]
 				],
 				[
@@ -1388,9 +1390,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							'description' => 'dep-trigger',
 							'expression' => '{template1:item.last(0)}'
-						],
+						]
 					]
-				],
+				]
 			],
 			'dependencies' => [
 				[
@@ -1400,7 +1402,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'description' => 'template1:common-trigger',
 					'depends' => 'template2:dep-trigger'
-				],
+				]
 			]
 		]);
 
@@ -1433,7 +1435,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'dep-trigger',
 					'expression' => '{template1:item.last(0)}'
-				],
+				]
 			],
 			'hosts' => [
 				[
@@ -1457,7 +1459,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			],
 			'templates' => [
 				[
@@ -1467,8 +1469,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'template' => 'template2',
 					'name' => 'template2'
-				],
-			],
+				]
+			]
 		]);
 
 		$this->assertConvert($expectedResult, $source);
@@ -1488,7 +1490,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host1',
@@ -1500,7 +1502,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_MONITORED,
 					'templates' => [
 						'template1',
-						'template2',
+						'template2'
 					]
 				],
 				[
@@ -1508,10 +1510,10 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'status' => HOST_STATUS_TEMPLATE,
 					'templates' => [
 						'template1',
-						'template2',
+						'template2'
 					]
 				]
-			],
+			]
 		]);
 
 		$expectedResult = $this->createExpectedResult([
@@ -1552,7 +1554,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'name' => 'template2'
-						],
+						]
 					],
 					'proxy' => [
 						'name' => ''
@@ -1568,9 +1570,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'name' => 'template2'
-						],
+						]
 					],
-					'name' => 'template',
+					'name' => 'template'
 				]
 			]
 		]);
@@ -1583,7 +1585,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host1',
@@ -1602,7 +1604,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'graph_elements' => [
 								[
 									'item' => 'host2:item'
-								],
+								]
 							]
 						],
 						[
@@ -1614,7 +1616,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 								[
 									'periods_cnt' => 5,
 									'item' => 'host2:item'
-								],
+								]
 							]
 						],
 						[
@@ -1631,7 +1633,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'item' => '{HOST.HOST}:ftp,3'
-								],
+								]
 							]
 						],
 						[
@@ -1645,9 +1647,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'item' => 'host3:item'
-								],
+								]
 							]
-						],
+						]
 					]
 				],
 				[
@@ -1665,7 +1667,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'item' => 'host3:item'
-								],
+								]
 							]
 						]
 					]
@@ -1683,12 +1685,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'graph_elements' => [
 								[
 									'item' => 'template:item'
-								],
+								]
 							]
 						]
 					]
 				]
-			],
+			]
 		]);
 
 		$expectedResult = $this->createExpectedResult([
@@ -1704,7 +1706,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 								'host' => 'host2',
 								'key' => 'item'
 							]
-						],
+						]
 					]
 				],
 				[
@@ -1724,7 +1726,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 								'host' => 'host2',
 								'key' => 'item'
 							]
-						],
+						]
 					]
 				],
 				[
@@ -1743,20 +1745,20 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'item' => [
 								'host' => 'host2',
 								'key' => 'net.tcp.service[ftp,,3]'
-							],
+							]
 						],
 						[
 							'item' => [
 								'host' => 'host2',
 								'key' => 'net.tcp.service[ftp,,3]'
-							],
+							]
 						],
 						[
 							'item' => [
 								'host' => 'host2',
 								'key' => 'net.tcp.service[ftp,,3]'
-							],
-						],
+							]
+						]
 					]
 				],
 				[
@@ -1775,13 +1777,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'item' => [
 								'host' => 'host2',
 								'key' => 'item'
-							],
+							]
 						],
 						[
 							'item' => [
 								'host' => 'host3',
 								'key' => 'item'
-							],
+							]
 						]
 					]
 				],
@@ -1795,8 +1797,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'item' => [
 								'host' => 'template',
 								'key' => 'item'
-							],
-						],
+							]
+						]
 					]
 				]
 			],
@@ -1844,7 +1846,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'proxy' => [
 						'name' => ''
 					]
-				],
+				]
 			],
 			'templates' => [
 				[
@@ -1862,7 +1864,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'status' => HOST_STATUS_MONITORED,
+					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host2',
@@ -1875,7 +1877,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'macros' => [
 						[
 							'name' => '{$MACRO}',
-							'value' => 'value',
+							'value' => 'value'
 						]
 					]
 				],
@@ -1885,11 +1887,11 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'macros' => [
 						[
 							'name' => '{$MACRO}',
-							'value' => 'value',
+							'value' => 'value'
 						]
 					]
-				],
-			],
+				]
+			]
 		]);
 
 		$expectedResult = $this->createExpectedResult([
@@ -1926,7 +1928,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'macros' => [
 						[
 							'macro' => '{$MACRO}',
-							'value' => 'value',
+							'value' => 'value'
 						]
 					],
 					'name' => 'host3',
@@ -1941,7 +1943,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'macros' => [
 						[
 							'macro' => '{$MACRO}',
-							'value' => 'value',
+							'value' => 'value'
 						]
 					],
 					'name' => 'template'
@@ -1967,7 +1969,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[],
 				[
 					'selements' => [],
-					'links' => [],
+					'links' => []
 				],
 				[
 					'selements' => [
@@ -1975,13 +1977,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'selementid' => 1,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 							'elementid' => [
-								'host' => 'host',
+								'host' => 'host'
 							],
 							'iconid_off' => [],
 							'iconid_on' => [],
 							'iconid_disabled' => [],
 							'iconid_maintenance' => [],
-							'iconid_unknown' => [],
+							'iconid_unknown' => []
 						],
 						[
 							'selementid' => 2,
@@ -2035,7 +2037,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'icon_off' => [],
 							'icon_on' => [],
 							'icon_disabled' => [],
-							'icon_maintenance' => [],
+							'icon_maintenance' => []
 						],
 						[
 							'selementid' => 2,
@@ -2095,8 +2097,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'resourceid' => [
-								'key_' => 'itemkey',
-							],
+								'key_' => 'itemkey'
+							]
 						]
 					]
 				]
@@ -2117,7 +2119,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'resource' => [
-								'key' => 'itemkey',
+								'key' => 'itemkey'
 							],
 							'sort_triggers' => ''
 						]

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2020 Zabbix SIA
+** Copyright (C) 2001-2021 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -418,7 +418,7 @@ function saveItemTestInputs() {
 	<?php if ($data['step_obj'] == -2): ?>
 		$test_obj = jQuery('.tfoot-buttons');
 	<?php elseif ($data['step_obj'] == -1): ?>
-		$test_obj = jQuery('preprocessing-list-foot', jQuery('#preprocessing'));
+		$test_obj = jQuery('.preprocessing-list-foot', jQuery('#preprocessing'));
 	<?php else: ?>
 		$test_obj = jQuery('.preprocessing-list-item[data-step=<?= $data['step_obj'] ?>]', jQuery('#preprocessing'));
 	<?php endif ?>
